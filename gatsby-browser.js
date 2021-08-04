@@ -1,7 +1,10 @@
-/**
- * Implement Gatsby's Browser APIs in this file.
- *
- * See: https://www.gatsbyjs.com/docs/browser-apis/
- */
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './src/layout/layout.css'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-// You can delete this file if you're not using it
+// export const onClientEntry = async () => {
+//     if (typeof IntersectionObserver === "undefined") {
+//       await import("intersection-observer")
+//     }
+//   }

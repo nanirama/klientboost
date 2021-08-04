@@ -1,55 +1,65 @@
-/**
- * Layout component that queries for data
- * with Gatsby's useStaticQuery component
- *
- * See: https://www.gatsbyjs.com/docs/use-static-query/
- */
+import React from "react"
+import SideBar from "./SwipeSideMenu"
+import Footer from "./Footer"
+import Header from "./Header"
+import { GlobalStyle } from "./styles/GlobalStyles"
+import styled from "styled-components"
+import { useSwipeable } from "react-swipeable";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import * as React from "react"
-import PropTypes from "prop-types"
-import { useStaticQuery, graphql } from "gatsby"
-
-import Header from "./header"
-import "./layout.css"
+import { StateProvider } from '../StateProvider';
+import reducer, { initialState } from '../reducer';
+import FloatingButtonCall from '../components/FloatingButtonCall'
+import FloatingButtonMessage from '../components/FloatingButtonMessage'
 
 const Layout = ({ children }) => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
-        }
-      }
-    }
-  `)
+  const [isOpen, setOpen] = React.useState(false);
+
+  const handlers = useSwipeable({
+    trackMouse: true,
+    onSwipedRight: () => setOpen(true)
+  });
+
+  const toggle = () => {
+    setOpen(!isOpen)
+  }
 
   return (
-    <>
-      <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
-      <div
-        style={{
-          margin: `0 auto`,
-          maxWidth: 960,
-          padding: `0 1.0875rem 1.45rem`,
-        }}
-      >
-        <main>{children}</main>
-        <footer
-          style={{
-            marginTop: `2rem`,
-          }}
-        >
-          © {new Date().getFullYear()}, Built with
-          {` `}
-          <a href="https://www.gatsbyjs.com">Gatsby</a>
-        </footer>
+    <div id="outer">
+      <GlobalStyle />
+      <SwipeLayer {...handlers} />
+      <SideBar
+        isOpen={isOpen}
+        onStateChange={s => setOpen(s.isOpen)}
+        pageWrapId={"inner-wrap"}
+        outerContainerId={"outer"}
+      />
+
+      <div id="inner-wrap">
+        <StateProvider initialState={initialState} reducer={reducer}>
+          <Header toggle={toggle} />
+          <main>{children}</main>
+          <FloatingButtonMessage />
+          <FloatingButtonCall />
+        </StateProvider>
       </div>
-    </>
+      <Footer />
+    </div>
   )
 }
 
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-}
-
 export default Layout
+
+const SwipeLayer = styled.div`  
+  display: none;
+
+  @media screen and (max-width: 768px) {
+    display: block;
+    float: left;
+    position: fixed;
+    width: 10px;
+    height: 100%;
+    z-index: 900;
+    top: 80px;
+  }
+`
